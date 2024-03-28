@@ -3,13 +3,11 @@ package com.gokhan.dkdemo.services;
 import com.gokhan.dkdemo.entity.User;
 import com.gokhan.dkdemo.repos.UserRepository;
 import com.gokhan.dkdemo.requests.UserRequest;
-
 import com.gokhan.dkdemo.responses.UserResponse;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -56,9 +54,8 @@ public class UserService {
     }
 
     public UserResponse updateOneUser(Long userId, UserRequest newUser) {
-        Optional<User> userOptional = userRepository.findById(userId);
-        if (userOptional.isPresent()) {
-            User foundUser = userOptional.get();
+        User foundUser = getUserById(userId);
+        if (foundUser != null) {
             foundUser.setUserName(newUser.getUserName());
             foundUser.setPassword(newUser.getPassword());
             userRepository.save(foundUser);
@@ -66,11 +63,9 @@ public class UserService {
         } else {
             return null;
         }
-
     }
 
     public void deleteById(Long userId) {
         userRepository.deleteById(userId);
     }
-
 }

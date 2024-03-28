@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 public class PostService {
     private final PostRepository postRepository;
     private final UserService userService;
-    private final UserRepository userRepository;
 
     public List<PostResponse> getAllPosts(Long userId) {
         List<Post> list;
@@ -56,21 +55,16 @@ public class PostService {
     }
 
     public PostResponse createNewPost(PostCreateRequest newPostRequest) {
-        Optional<User> user = userRepository.findById(newPostRequest.getId());
-        if (user == null) {
-            return null;
-        } else {
-            Post post = new Post();
-            post.setId(newPostRequest.getId());
-            post.setTitle(newPostRequest.getTitle());
-            post.setText(newPostRequest.getText());
-            post.setUser(user.get());
-            PostResponse postResponse = PostResponse.builder().title(newPostRequest.getTitle()).text(newPostRequest.getText())
-                    .userName(post.getUser().getUserName()).build();
-            return postResponse;
+        if (newPostRequest.getUserId() == null) {
+            throw new RuntimeException("Userın id si dolu olmalıdır!!");
         }
-
-
+        User user = userService.getUserById(newPostRequest.getUserId());
+        Post post = Post.builder().text(newPostRequest.getText()).title(newPostRequest.getTitle()).user(user).build();
+        postRepository.save(post);
+        return PostResponse.builder()
+                .title(post.getTitle()).text(post.getText())
+                .userName(post.getUser().getUserName())
+                .build();
     }
 
     public PostResponse updateOnePost(Long postId, PostUpdateRaquest postUpdateRaquest) {
@@ -89,5 +83,3 @@ public class PostService {
         postRepository.deleteById(postId);
     }
 }
-
-
