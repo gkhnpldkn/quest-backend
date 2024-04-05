@@ -17,11 +17,17 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
+
 public class CommentService {
-    private final CommentRepository commentRepository;
-    private final UserService userService;
-    private final PostService postService;
+    private  CommentRepository commentRepository;
+    private  UserService userService;
+    private  PostService postService;
+
+    public CommentService(CommentRepository commentRepository, UserService userService, PostService postService) {
+        this.commentRepository = commentRepository;
+        this.userService = userService;
+        this.postService = postService;
+    }
 
     public List<CommentResponse> getAllCommentsWithParam(Long userId, Long postId) {
         List<Comment> commentList;

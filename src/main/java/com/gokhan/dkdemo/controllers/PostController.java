@@ -17,7 +17,7 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping
-    public List<PostResponse> getAllPosts(@RequestParam Long userId){
+    public List<PostResponse> getAllPosts(@RequestParam(required = false) Long userId){
         return postService.getAllPosts(userId);
     }
     @GetMapping("/{postId}")

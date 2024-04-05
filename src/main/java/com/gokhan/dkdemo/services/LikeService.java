@@ -28,7 +28,6 @@ public class LikeService {
         List<Like> likeList;
         List<LikeResponse> likeResponseList = new ArrayList<>();
 
-
         if (userId != null && postId != null) {
             likeList = likeRepository.findByUserIdAndPostId(userId, postId);
         } else if (userId != null) {
@@ -47,44 +46,34 @@ public class LikeService {
         return likeResponseList;
     }
 
-
-    public LikeResponse getOneLikeById (Long LikeId) {
+    public LikeResponse getOneLikeById(Long LikeId) {
         Like like = likeRepository.findById(LikeId).orElse(null);
 
         LikeResponse likeResponse = getLikeResponse(like);
         return likeResponse;
     }
 
-
-    public LikeResponse createOneLike (CreateLikeRequest request){
+    public LikeResponse createOneLike(CreateLikeRequest request){
             User user = userService.getUserById(request.getUserId());
             Post post = postService.getPostById(request.getPostId());
 
-            if (user == null && post == null) {
-                return null;
+            if (user == null || post == null) {
+                throw new RuntimeException("User ve post boş olamaz");
             }
 
-            Like.LikeBuilder likeBuilder = Like.builder();
-
-            if (user != null) {
-                likeBuilder.user(user);
-            }
-            if (post != null) {
-                likeBuilder.post(post);
-            }
-            Like like = likeBuilder.build();
+            Like like = Like.builder().user(user).post(post).build();
             likeRepository.save(like);
 
             return getLikeResponse(like);
         }
 
-        public void deleteOneLikeById (Long likeId){
-            likeRepository.deleteById(likeId);
-        }
+    public void deleteOneLikeById (Long likeId){
+        likeRepository.deleteById(likeId);
+    }
 
     private LikeResponse getLikeResponse(Like like) {
         if (like == null) {
-            return null;
+            throw new RuntimeException("Like boş olamaz!");
         }
         User userSaved = like.getUser();
         UserResponse userResponse = null;
@@ -104,7 +93,8 @@ public class LikeService {
                     .build();
         }
 
-        return LikeResponse.builder().id(like.getId())
+        return LikeResponse.builder()
+                .id(like.getId())
                 .postResponse(postResponse)
                 .userResponse(userResponse)
                 .build();
