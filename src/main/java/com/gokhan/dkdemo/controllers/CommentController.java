@@ -3,7 +3,6 @@ package com.gokhan.dkdemo.controllers;
 import com.gokhan.dkdemo.requests.CommentUpdateRequest;
 import com.gokhan.dkdemo.requests.CreateCommentRequest;
 import com.gokhan.dkdemo.services.CommentService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import com.gokhan.dkdemo.responses.CommentResponse;
 
@@ -11,9 +10,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/comments")
-@RequiredArgsConstructor
 public class CommentController {
     private final CommentService commentService;
+
+    public CommentController(CommentService commentService) {
+        this.commentService = commentService;
+    }
 
     @GetMapping
     public List<CommentResponse> getAllComment(@RequestParam Long userId, @RequestParam Long postId) {
@@ -39,5 +41,4 @@ public class CommentController {
     public void deleteOneComment(@PathVariable Long commentId) {
         commentService.deleteOneCommentById(commentId);
     }
-
 }

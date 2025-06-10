@@ -8,8 +8,6 @@ import com.gokhan.dkdemo.requests.CreateLikeRequest;
 import com.gokhan.dkdemo.responses.LikeResponse;
 import com.gokhan.dkdemo.responses.PostResponse;
 import com.gokhan.dkdemo.responses.UserResponse;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,11 +16,16 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class LikeService {
     private final LikeRepository likeRepository;
     private final UserService userService;
     private final PostService postService;
+
+    public LikeService(LikeRepository likeRepository, UserService userService, PostService postService) {
+        this.likeRepository = likeRepository;
+        this.userService = userService;
+        this.postService = postService;
+    }
 
     public List<LikeResponse> getAllLikesWithParam(Long userId, Long postId) {
         List<Like> likeList;
@@ -61,7 +64,9 @@ public class LikeService {
                 throw new RuntimeException("User ve post boş olamaz");
             }
 
-            Like like = Like.builder().user(user).post(post).build();
+            Like like = new Like();
+            like.setUser(user);
+            like.setPost(post);
             likeRepository.save(like);
 
             return getLikeResponse(like);
@@ -78,25 +83,21 @@ public class LikeService {
         User userSaved = like.getUser();
         UserResponse userResponse = null;
         if (userSaved != null) {
-            userResponse = UserResponse.builder().id(userSaved.getId()).userName(userSaved.getUserName()).password(userSaved.getPassword()).build();
+            userResponse = new UserResponse(userSaved.getId(), userSaved.getUserName(), userSaved.getPassword());
         }
 
         Post postSaved = like.getPost();
         PostResponse postResponse = null;
         if (postSaved != null) {
-            postResponse = PostResponse.builder()
-                    .id(postSaved.getId())
-                    .title(postSaved.getTitle())
-                    .text(postSaved.getText())
-                    .userId(postSaved.getUser().getId())
-                    .userName(postSaved.getUser().getUserName())
-                    .build();
+            postResponse = new PostResponse(
+                postSaved.getId(),
+                postSaved.getUser().getId(),
+                postSaved.getUser().getUserName(),
+                postSaved.getTitle(),
+                postSaved.getText()
+            );
         }
 
-        return LikeResponse.builder()
-                .id(like.getId())
-                .postResponse(postResponse)
-                .userResponse(userResponse)
-                .build();
+        return new LikeResponse(like.getId(), userResponse, postResponse);
     }
 }

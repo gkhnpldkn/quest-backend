@@ -1,19 +1,19 @@
 package com.gokhan.dkdemo.requests;
 
-public class PostCreateRequest {
+public class CommentCreateRequest {
     private Long id;
     private String text;
-    private String title;
     private Long userId;
+    private Long postId;
 
-    public PostCreateRequest() {
+    public CommentCreateRequest() {
     }
 
-    public PostCreateRequest(Long id, String text, String title, Long userId) {
+    public CommentCreateRequest(Long id, String text, Long userId, Long postId) {
         this.id = id;
         this.text = text;
-        this.title = title;
         this.userId = userId;
+        this.postId = postId;
     }
 
     public Long getId() {
@@ -32,14 +32,6 @@ public class PostCreateRequest {
         this.text = text;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
     public Long getUserId() {
         return userId;
     }
@@ -47,4 +39,12 @@ public class PostCreateRequest {
     public void setUserId(Long userId) {
         this.userId = userId;
     }
-}
+
+    public Long getPostId() {
+        return postId;
+    }
+
+    public void setPostId(Long postId) {
+        this.postId = postId;
+    }
+} 

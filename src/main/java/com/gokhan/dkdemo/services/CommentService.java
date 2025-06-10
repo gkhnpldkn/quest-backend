@@ -9,7 +9,6 @@ import com.gokhan.dkdemo.requests.CreateCommentRequest;
 import com.gokhan.dkdemo.responses.CommentResponse;
 import com.gokhan.dkdemo.responses.PostResponse;
 import com.gokhan.dkdemo.responses.UserResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,11 +16,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-
 public class CommentService {
-    private  CommentRepository commentRepository;
-    private  UserService userService;
-    private  PostService postService;
+    private CommentRepository commentRepository;
+    private UserService userService;
+    private PostService postService;
 
     public CommentService(CommentRepository commentRepository, UserService userService, PostService postService) {
         this.commentRepository = commentRepository;
@@ -60,7 +58,10 @@ public class CommentService {
         User user = userService.getUserById(request.getUserId());
         Post post = postService.getPostById(request.getPostId());
         if (user != null && post != null) {
-            Comment comment = Comment.builder().text(request.getText()).user(user).post(post).build();
+            Comment comment = new Comment();
+            comment.setText(request.getText());
+            comment.setUser(user);
+            comment.setPost(post);
             commentRepository.save(comment);
             return getCommentResponse(comment);
         }
@@ -70,7 +71,7 @@ public class CommentService {
     public CommentResponse updateOneCommentById(Long commentId, CommentUpdateRequest request) {
         Optional<Comment> commentOptional = commentRepository.findById(commentId);
         if (commentOptional.isPresent()){
-            Comment updatedComment= commentOptional.get();
+            Comment updatedComment = commentOptional.get();
             updatedComment.setText(request.getText());
             commentRepository.save(updatedComment);
             return getCommentResponse(updatedComment);
@@ -89,25 +90,21 @@ public class CommentService {
         User userSaved = comment.getUser();
         UserResponse userResponse = null;
         if (userSaved != null) {
-            userResponse = UserResponse.builder().id(userSaved.getId()).userName(userSaved.getUserName()).password(userSaved.getPassword()).build();
+            userResponse = new UserResponse(userSaved.getId(), userSaved.getUserName(), userSaved.getPassword());
         }
 
         Post postSaved = comment.getPost();
         PostResponse postResponse = null;
         if (postSaved != null) {
-            postResponse = PostResponse.builder()
-                    .id(postSaved.getId())
-                    .title(postSaved.getTitle())
-                    .text(postSaved.getText())
-                    .userId(postSaved.getUser().getId())
-                    .userName(postSaved.getUser().getUserName())
-                    .build();
+            postResponse = new PostResponse(
+                postSaved.getId(),
+                postSaved.getUser().getId(),
+                postSaved.getUser().getUserName(),
+                postSaved.getTitle(),
+                postSaved.getText()
+            );
         }
 
-        return CommentResponse.builder().id(comment.getId())
-                .text(comment.getText())
-                .postResponse(postResponse)
-                .userResponse(userResponse)
-                .build();
+        return new CommentResponse(comment.getId(), comment.getText(), userResponse, postResponse);
     }
 }

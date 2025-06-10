@@ -21,22 +21,20 @@ public class UserService {
         List<User> userList = userRepository.findAll();
         List<UserResponse> userResponseList = new ArrayList<>();
         userList.forEach(user -> {
-            UserResponse userResponse = UserResponse.builder()
-                    .id(user.getId())
-                    .userName(user.getUserName())
-                    .password(user.getPassword())
-                    .build();
+            UserResponse userResponse = new UserResponse(user.getId(), user.getUserName(), user.getPassword());
             userResponseList.add(userResponse);
         });
         return userResponseList;
     }
 
     public UserResponse saveOneUser(UserRequest newUser) {
-        User user = User.builder().userName(newUser.getUserName()).password(newUser.getPassword()).build();
+        User user = new User();
+        user.setUserName(newUser.getUserName());
+        user.setPassword(newUser.getPassword());
 
         user = userRepository.save(user);
 
-        return UserResponse.builder().id(user.getId()).userName(user.getUserName()).password(user.getPassword()).build();
+        return new UserResponse(user.getId(), user.getUserName(), user.getPassword());
     }
 
     public UserResponse getOneUser(Long userId) {
@@ -44,13 +42,20 @@ public class UserService {
         if (user == null) {
             return null;
         }
-        UserResponse userResponse = UserResponse.builder().id(user.getId()).userName(user.getUserName()).password(user.getPassword()).build();
-        return userResponse;
+        return new UserResponse(user.getId(), user.getUserName(), user.getPassword());
     }
 
     public User getUserById(Long userId) {
         User user = userRepository.findById(userId).orElse(null);
         return user;
+    }
+
+    public UserResponse getUserByUsername(String username) {
+        User user = userRepository.findByUserName(username);
+        if (user == null) {
+            return null;
+        }
+        return new UserResponse(user.getId(), user.getUserName(), user.getPassword());
     }
 
     public UserResponse updateOneUser(Long userId, UserRequest newUser) {
@@ -59,7 +64,7 @@ public class UserService {
             foundUser.setUserName(newUser.getUserName());
             foundUser.setPassword(newUser.getPassword());
             userRepository.save(foundUser);
-            return UserResponse.builder().id(foundUser.getId()).userName(foundUser.getUserName()).password(foundUser.getPassword()).build();
+            return new UserResponse(foundUser.getId(), foundUser.getUserName(), foundUser.getPassword());
         } else {
             return null;
         }
